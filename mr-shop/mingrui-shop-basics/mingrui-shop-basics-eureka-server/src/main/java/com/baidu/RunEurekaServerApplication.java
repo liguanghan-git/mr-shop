@@ -18,6 +18,7 @@ public class RunEurekaServerApplication {
 
      public static void main(String[] args) {
 
-             SpringApplication.run(RunEurekaServerApplication.class, args);
+         System.out.println("aaa");
+         SpringApplication.run(RunEurekaServerApplication.class, args);
      }
 }
