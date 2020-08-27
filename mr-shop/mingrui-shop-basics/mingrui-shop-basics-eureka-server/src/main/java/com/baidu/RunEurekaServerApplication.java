@@ -6,7 +6,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 /**
  * @ClassName TestEurekaFeignController
- * @Description: TODO
+ * @Description: TODOlll
  * @Author liguanghan
  * @Date 2020/8/27
  * @Version V1.0
