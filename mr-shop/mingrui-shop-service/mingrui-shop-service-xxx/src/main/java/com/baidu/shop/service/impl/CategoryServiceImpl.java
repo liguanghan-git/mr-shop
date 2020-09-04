@@ -2,8 +2,14 @@ package com.baidu.shop.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.entity.CategoryBrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpecParamEntity;
+import com.baidu.shop.mapper.CategoryBrandMapper;
 import com.baidu.shop.mapper.CategoryMapper;
+import com.baidu.shop.mapper.SpecGroupMapper;
+import com.baidu.shop.mapper.SpecParamMapper;
 import com.baidu.shop.service.BaseApiService;
 import com.baidu.shop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +32,10 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private SpecGroupMapper specGroupMapper;
+    @Autowired
+    private CategoryBrandMapper categoryBrandMapper;
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
@@ -39,7 +49,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess(select);
     }
 
-    //在公司不加这个注解 会被开除的
+    //增删改必加注解
     //只要代码出问题就会回滚，回到原始，保证程序不会出问题，不加这个注解，一但出错，会影响数据库
     @Transactional
     @Override
@@ -68,6 +78,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess();
     }
 
+
     @Transactional
     @Override
     public Result<JSONObject> updateCategory(CategoryEntity categoryEntity) {
@@ -77,47 +88,76 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         return this.setResultSuccess();
     }
 
+
+    String msg = " ";
     @Transactional
     @Override
     public Result<JSONObject> deleteCategory(Integer id) {
+        msg = "";
 
         //验证传入的id是否有效,并且查询出来的数据对接下来的程序有用
         CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
-
         //判断是否有数据(安全)
         if(categoryEntity == null){
-
             return this.setResultSuccess("当前id不存在");
         }
-
         //判断当前节点是否是父级节点(安全)
         if(categoryEntity.getParentId() == 1){
-
             return this.setResultSuccess("当前节点为父节点，不能删除");
+        }
+
+        //被规格组绑定分类不能被删除
+        Example example1 = new Example(SpecGroupEntity.class);
+        example1.createCriteria().andEqualTo("cid",id);
+        List<SpecGroupEntity> list1 = specGroupMapper.selectByExample(example1);
+        if(list1.size() != 0){
+            for(SpecGroupEntity specGroupEntity : list1){
+                msg += specGroupEntity.getName();
+            }
+            return this.setResultError(msg + "被规格组绑定分类不能被删除");
+        }
+
+        //被品牌和分类中间表绑定不能被删除
+        Example example2 = new Example(CategoryBrandEntity.class);
+        example2.createCriteria().andEqualTo("categoryId",id);
+        List<CategoryBrandEntity> categoryBrandEntities = categoryBrandMapper.selectByExample(example2);
+        if(categoryBrandEntities.size() != 0){
+            for(CategoryBrandEntity categoryBrandEntity : categoryBrandEntities){
+                msg += categoryBrandEntity.getCategoryId();
+            }
+            return this.setResultError(msg + "被品牌和分类中间表绑定不能被删除");
         }
 
 
         //判断当前节点的父节点下 除了当前节点是否还有别的节点(业务)
-
-        //这里需要在调研调研
-
         Example example = new Example(CategoryEntity.class);
         example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
 
         List<CategoryEntity> list = categoryMapper.selectByExample(example);
         if (list.size() == 1){
-
+            // 如果没有就将当前节点的父节点isParent的值修改为0
             CategoryEntity parentCateEntity = new CategoryEntity();
             parentCateEntity.setId(categoryEntity.getParentId());
             parentCateEntity.setIsParent(0);
             categoryMapper.updateByPrimaryKeySelective(parentCateEntity);
-
         }
 
-        // 如果没有就将当前节点的父节点isParent的值修改为0
 
 
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }
+
+
+    @Override
+    public Result<List<CategoryEntity>> getByBrand(Integer brandId) {
+
+        List<CategoryEntity> byBrand = categoryMapper.getByBrandId(brandId);
+
+        return this.setResultSuccess(byBrand);
+
+    }
+
+
+
 }

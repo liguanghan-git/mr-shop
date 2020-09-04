@@ -1,0 +1,31 @@
+server:
+  port: 8200
+spring:
+  application:
+    name: upload-server
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+fdfs:
+  so-timeout: 1501
+  connect-timeout: 601
+  thumb-image: # 缩略图
+    width: 100
+    height: 100
+  tracker-list: # tracker地址
+    - 120.53.10.17:22122
+
+
+mingrui:
+  upload:
+    path:
+      windows: E:\\images
+      linux: /liguanghan/images
+    img:
+      host: http://120.53.10.17/
+logging:
+  level:
+    com.baidu.controller:
+                    debug
