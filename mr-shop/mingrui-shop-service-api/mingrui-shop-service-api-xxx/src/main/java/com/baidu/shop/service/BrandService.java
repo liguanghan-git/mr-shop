@@ -24,7 +24,7 @@ public interface BrandService {
 
     @ApiOperation(value = "获取品牌信息")
     @GetMapping(value = "brand/getBrandInfo")
-    public Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO);
+    Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO);
 
     @PostMapping(value = "brand/save")
     @ApiOperation(value = "增加品牌信息")
