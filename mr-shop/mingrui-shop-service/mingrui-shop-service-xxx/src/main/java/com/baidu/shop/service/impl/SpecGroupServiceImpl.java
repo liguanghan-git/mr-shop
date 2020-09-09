@@ -94,10 +94,18 @@ public class SpecGroupServiceImpl extends BaseApiService implements Specificatio
     public Result<List<SpecParamEntity>> getSpecParam(SpecParamDTO specParamDTO) {
 
         //自定义异常？？？？
-        if(ObjectUtil.isNull(specParamDTO.getGroupId())) return this.setResultError("规格组id不能为空");
+        //if(ObjectUtil.isNull(specParamDTO.getGroupId())) return this.setResultError("规格组id不能为空");
 
         Example example = new Example(SpecParamEntity.class);
-        example.createCriteria().andEqualTo("groupId",specParamDTO.getGroupId());
+        Example.Criteria criteria = example.createCriteria();
+
+        if(ObjectUtil.isNotNull(specParamDTO.getGroupId())){
+            criteria.andEqualTo("groupId",specParamDTO.getGroupId());
+        }
+        if(ObjectUtil.isNotNull(specParamDTO.getCid())){
+            criteria.andEqualTo("cid",specParamDTO.getCid());
+        }
+
 
         List<SpecParamEntity> list = specParamMapper.selectByExample(example);
 
