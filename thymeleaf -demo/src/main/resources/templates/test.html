@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试thymeleaf</title>
+</head>
+<body>
+<!-- th:指令依赖于h5-->
+    你好，<span th:text="${stu.code.substring(2)}"></span><br/>
+    <!--你好，<span th:text="${stu.code.split('')[1]}"></span><br/>-->
+<!--  data-th-text 指令支持非 h5-->
+    密码是：<span data-th-text="${stu.pass}"></span><br/>
+<!--对象['属性值'] 如果变量是动态的，可以用此属性-->
+    您的年龄是：<span th:text="${stu['age']}"></span><br/>
+<!--对象的value中有html需要渲染的使用 utext 输出-->
+    您喜欢的颜色是：<span th:utext="${stu.likeColor}"></span><br/>
+
+===================================================<br/>
+
+    是字符串：<span th:text="'888'"></span><br/>
+    数字：<span th:text="521*2"></span><br/>
+
+    th:if判断：<span th:if="${stu.age} >= 18">
+        成年
+    </span><br/>
+
+===================================================<br/>
+
+    字符串''拼接：<span th:text="'狗粑粑不是狗粑粑' + ${stu.code} + '666'"></span><br/>
+    ||拼接：<span th:text="|狗粑粑不是狗粑粑 ${stu.code} 666|"></span><br/>
+
+===================================================<br/>
+
+    乘法运算：<span th:text="${stu.age} * 8"></span><br/>
+    三元运算: <span th:text="${stu.age} ge 18 ? '成年' : '不成年'"></span><br/>
+
+    非空判断？？？<span th:text="${stu.code} ?: '未输入'"></span><br/>
+
+===================================================<br/>
+
+    是否：<span th:if="${stu.age>60}">可以退休</span><br/>
+
+    嗯哼：<span th:unless="${stu.age>60}">不能退休</span>
+
+</body>
+</html>

@@ -34,4 +34,10 @@ public interface CategoryService {
     @GetMapping(value = "category/getByBrand")
     Result<List<CategoryEntity>> getByBrand(Integer  brandId);
 
+
+    //@RequestParam Feign的注解
+    @ApiOperation("通过分类id查询分类信息")
+    @GetMapping("category/getCateByIds")
+    Result<List<CategoryEntity>> getCateByIds(@RequestParam String cateIds);
+
 }

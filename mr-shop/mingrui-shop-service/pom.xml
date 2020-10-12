@@ -15,6 +15,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>mingrui-shop-service-xxx</module>
+        <module>mingrui-shop-service-search</module>
+        <module>mingrui-shop-service-template</module>
     </modules>
 
 
@@ -56,6 +58,12 @@
             <groupId>com.baidu</groupId>
             <artifactId>mingrui-shop-service-api-xxx</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--rabbitmq-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
     </dependencies>

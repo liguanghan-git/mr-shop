@@ -2,10 +2,11 @@ package com.baidu.shop.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.MrRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
-import com.baidu.shop.dto.SpuDetailDTO;
 import com.baidu.shop.entity.*;
 import com.baidu.shop.mapper.*;
 import com.baidu.shop.service.BaseApiService;
@@ -41,15 +42,11 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private SpuMapper spuMapper;
 
-    @Autowired
+    @Resource
     private BrandService brandService;
 
     @Resource
-    private BrandMapper brandMapper;
-
-    @Resource
     private CategoryMapper categoryMapper;
-
 
     @Resource
     private SkuMapper skuMapper;
@@ -60,10 +57,16 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     @Resource
     private StockMapper stockMapper;
 
+    @Resource
+    private MrRabbitMQ mrRabbitMQ;
+
+
+    //删除
 
     @Transactional
     @Override
     public Result<JSONObject> del(Integer spuId) {
+
 
         //删除spu
         spuMapper.deleteByPrimaryKey(spuId);
@@ -140,9 +143,23 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         return this.setResultSuccess(skuDTOS);
     }
 
+    @Override
+    public Result<List<SpuDTO>> xiajia(SpuEntity spuEntity) {
+
+        if(spuEntity.getSaleable() == 1){
+            spuEntity.setSaleable(0);
+        }else{
+            spuEntity.setSaleable(1);
+        }
+
+        spuMapper.updateByPrimaryKeySelective(spuEntity);
+
+
+        return this.setResultSuccess();
+    }
 
     //增加
-    @Transactional
+    @Transactional////jvm 虚拟机栈 -->入栈和出栈的问题
     @Override
     public Result<JSONObject> addInfo(SpuDTO spuDTO) {
 
@@ -181,6 +198,7 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 //
 //        });
 
+        mrRabbitMQ.send(spuEntity.getId() + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
 
         return this.setResultSuccess();
     }
@@ -202,9 +220,13 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         //按标题模糊匹配
         if(StringUtil.isNotEmpty(spuDTO.getTitle()))
             criteria.andLike("title","%" + spuDTO.getTitle() +"%");
-        //如果值为2的话不进行拼接查询,默认查询所有
+        //如果值为2的话不进行拼接查询,默认查询所有    上下架
         if (ObjectUtil.isNotNull(spuDTO.getSaleable()) && spuDTO.getSaleable() != 2)
             criteria.andEqualTo("saleable",spuDTO.getSaleable());
+
+        if (ObjectUtil.isNotNull(spuDTO.getId())) {
+            criteria.andEqualTo("id",spuDTO.getId());
+        }
 
         //排序
         if(ObjectUtil.isNotNull(spuDTO.getSort()))

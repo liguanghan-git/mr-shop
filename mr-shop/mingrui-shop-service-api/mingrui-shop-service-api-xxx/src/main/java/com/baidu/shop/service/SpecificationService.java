@@ -10,6 +10,7 @@ import com.baidu.shop.validate.group.MingruiOperation;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public interface SpecificationService {
 
     @ApiModelProperty(value = "通过条件查询规格组")
     @GetMapping(value = "specgroup/specification")
-    Result<List<SpecGroupEntity>> specification (SpecGroupDTO specGroupDTO);
+    Result<List<SpecGroupEntity>> specification (@SpringQueryMap SpecGroupDTO specGroupDTO);
 
     @ApiModelProperty(value = "新增规格组")
     @PostMapping(value = "specgroup/saveOrUpdate")
@@ -36,8 +37,8 @@ public interface SpecificationService {
     Result<JSONObject> delete(Integer id);
 
     @ApiModelProperty(value = "通过条件查询规格参数")
-    @GetMapping(value = "specgroup/getSpecParam")
-    Result<List<SpecParamEntity>> getSpecParam(SpecParamDTO specParamDTO);
+    @GetMapping(value = "specgroup/getSpecParam")//SpecGroupEntity
+    Result<List<SpecParamEntity>> getSpecParam(@SpringQueryMap SpecParamDTO specParamDTO);
 
     @ApiModelProperty(value = "新增规格参数")
     @PostMapping(value = "specgroup/addOrUpdateParam")

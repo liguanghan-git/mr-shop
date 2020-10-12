@@ -102,10 +102,14 @@ public class SpecGroupServiceImpl extends BaseApiService implements Specificatio
         if(ObjectUtil.isNotNull(specParamDTO.getGroupId())){
             criteria.andEqualTo("groupId",specParamDTO.getGroupId());
         }
+
         if(ObjectUtil.isNotNull(specParamDTO.getCid())){
             criteria.andEqualTo("cid",specParamDTO.getCid());
         }
-
+        //过滤条件
+        if (ObjectUtil.isNotNull(specParamDTO.getSearching())) {
+            criteria.andEqualTo("searching",specParamDTO.getSearching());
+        }
 
         List<SpecParamEntity> list = specParamMapper.selectByExample(example);
 

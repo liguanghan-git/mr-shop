@@ -2,14 +2,8 @@ package com.baidu.shop.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.entity.CategoryBrandEntity;
-import com.baidu.shop.entity.CategoryEntity;
-import com.baidu.shop.entity.SpecGroupEntity;
-import com.baidu.shop.entity.SpecParamEntity;
-import com.baidu.shop.mapper.CategoryBrandMapper;
-import com.baidu.shop.mapper.CategoryMapper;
-import com.baidu.shop.mapper.SpecGroupMapper;
-import com.baidu.shop.mapper.SpecParamMapper;
+import com.baidu.shop.entity.*;
+import com.baidu.shop.mapper.*;
 import com.baidu.shop.service.BaseApiService;
 import com.baidu.shop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName TestEurekaFeignController
@@ -37,6 +33,20 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
     private SpecGroupMapper specGroupMapper;
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
+    @Resource
+    private SpuMapper spuMapper;
+
+
+    @Override
+    public Result<List<CategoryEntity>> getCateByIds(String cateIds) {
+
+        List<Integer> cateIdsArr = Arrays.asList(cateIds.split(","))
+                .stream().map(idsArr -> Integer.parseInt(idsArr))
+                .collect(Collectors.toList());
+        //查询
+        List<CategoryEntity> list = categoryMapper.selectByIdList(cateIdsArr);
+        return this.setResultSuccess(list);
+    }
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
@@ -127,6 +137,17 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
                 msg += categoryBrandEntity.getCategoryId();
             }
             return this.setResultError(msg + "被品牌和分类中间表绑定不能被删除");
+        }
+
+
+        Example example3 = new Example(SpuEntity.class);
+        Example.Criteria cid3 = example3.createCriteria().andEqualTo("cid3", id);
+        List<SpuEntity> SpuList = spuMapper.selectByExample(cid3);
+        if(SpuList.size() != 0){
+            for (SpuEntity spuEntity : SpuList){
+                msg += spuEntity.getTitle();
+            }
+            return this.setResultError((msg + ": 绑定商品不能被删除"));
         }
 
 

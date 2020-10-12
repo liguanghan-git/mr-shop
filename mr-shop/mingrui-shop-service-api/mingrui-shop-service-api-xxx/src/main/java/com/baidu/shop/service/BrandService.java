@@ -8,6 +8,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,7 @@ public interface BrandService {
 
     @ApiOperation(value = "获取品牌信息")
     @GetMapping(value = "brand/getBrandInfo")
-    Result<PageInfo<BrandEntity>> getBrandInfo(BrandDTO brandDTO);
+    Result<PageInfo<BrandEntity>> getBrandInfo(@SpringQueryMap BrandDTO brandDTO);
 
     @PostMapping(value = "brand/save")
     @ApiOperation(value = "增加品牌信息")
@@ -43,5 +44,10 @@ public interface BrandService {
     @GetMapping(value = "brand/getBrandByCategory")
     @ApiOperation(value = "通过分类id获取品牌")
     Result<List<BrandEntity>> getBrandByCategory(Integer cid);
+
+
+    @ApiOperation("通过品牌id集合获取品牌")
+    @GetMapping("brand/getBrandByIds")
+    Result<List<BrandEntity>> getBrandByIds(@RequestParam String brandIds);
 
 }

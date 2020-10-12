@@ -5,8 +5,10 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.mapper.BrandMapper;
 import com.baidu.shop.mapper.CategoryBrandMapper;
+import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.BrandService;
 import com.baidu.shop.utils.BaiduBeanUtil;
 import com.baidu.shop.utils.ObjectUtil;
@@ -53,6 +55,24 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
 
+    @Resource
+    private SpuMapper spuMapper;
+
+
+    @Override
+    public Result<List<BrandEntity>> getBrandByIds(String brandIds) {
+
+        //Arrays.asList()-->将数组转化为list   brandIds.split(",")-->把通过brands查询出的集合用逗号分开
+        //通过.stream().map()遍历 将对象转换成另一个对象
+        //获取列表中所有用户的用户名集合-->  .collect(Collectors.toList()
+        List<Integer> brandIdsArr = Arrays.asList(brandIds.split(","))
+                .stream().map(brandstr -> Integer.parseInt(brandstr))
+                .collect(Collectors.toList());
+        //批量查询
+        List<BrandEntity> list = brandMapper.selectByIdList(brandIdsArr);
+
+        return this.setResultSuccess(list);
+    }
 
     @Override
     public Result<List<BrandEntity>> getBrandByCategory(Integer cid) {
@@ -60,7 +80,6 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         List<BrandEntity> list = brandMapper.getBrandByCategory(cid);
         return this.setResultSuccess(list);
     }
-
 
 
     @Override
@@ -145,9 +164,22 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         return this.setResultSuccess();
     }
 
+    String mag = "  ";
     @Transactional
     @Override
     public Result<JsonObject> deleteBrand(Integer id) {
+
+        mag = "  ";
+
+        Example example = new Example(SpuEntity.class);
+        Example.Criteria brandId = example.createCriteria().andEqualTo("brandId", id);
+        List<SpuEntity> SpuList = spuMapper.selectByExample(brandId);
+        if(SpuList.size() != 0){
+            for (SpuEntity spuEntity : SpuList){
+                mag += spuEntity.getTitle();
+            }
+            return this.setResultError((mag + ": 绑定商品不能被删除"));
+        }
 
         //删除品牌
         brandMapper.deleteByPrimaryKey(id);

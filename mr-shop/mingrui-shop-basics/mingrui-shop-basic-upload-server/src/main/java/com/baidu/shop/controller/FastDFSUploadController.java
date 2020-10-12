@@ -1,4 +1,4 @@
-package com.baidu.controller;
+package com.baidu.shop.controller;
 
 import com.baidu.shop.base.Result;
 import com.baidu.shop.status.HTTPStatus;

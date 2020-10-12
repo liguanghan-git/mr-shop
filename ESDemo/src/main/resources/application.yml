@@ -1,0 +1,4 @@
+spring:
+  elasticsearch:
+    rest:
+      uris: 120.53.10.17:9200
