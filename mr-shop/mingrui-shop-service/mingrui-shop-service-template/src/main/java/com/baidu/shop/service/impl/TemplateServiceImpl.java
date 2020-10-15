@@ -58,6 +58,19 @@ public class TemplateServiceImpl extends BaseApiService implements TemplateServi
     private String staticHTMLPath;
 
     @Override
+    public Result<JSONObject> delHTMLBySpuId(Integer spuId) {
+
+        File file = new File(staticHTMLPath + File.separator + spuId + ".html");
+
+        //file.delete() 删除文件 --> boolean(true:删除成功 false:删除失败)
+        if(!file.delete()){
+            return this.setResultError("文件删除失败");
+        }
+
+        return this.setResultSuccess();
+    }
+
+    @Override
     public Result<JSONObject> createStaticHTMLTemplate(Integer spuId) {
         //获取数据获取上下文
         Map<String, Object> map = this.getPageInfoBySpuId(spuId);
@@ -105,6 +118,7 @@ public class TemplateServiceImpl extends BaseApiService implements TemplateServi
 
         return this.setResultSuccess();
     }
+
 
     private Map<String, Object> getPageInfoBySpuId(Integer spuId) {
 
